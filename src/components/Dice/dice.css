@@ -1,0 +1,20 @@
+.dice {
+    width: 7vw;
+    height: 12vh;
+    background-size: 90%;
+    background-position: center;
+    background-repeat: no-repeat;
+
+}
+
+.dice__container {
+    border-radius: 50%;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 11vw;
+    height: 15vh;
+    margin: .7rem;
+
+}
