@@ -1,3 +1,4 @@
+/* basic */
 .board {
     background: rgb(13, 107, 29);
     background: linear-gradient(34deg, rgba(13, 107, 29, 1) 21%, rgba(11, 77, 16, 1) 65%, rgba(11, 82, 30, 0.9752275910364145) 92%);
@@ -10,6 +11,47 @@
     justify-content: space-around;
 }
 
+.btn {
+    color: azure;
+    font-size: 1.5rem;
+    padding: .5rem;
+    border-radius: 5px;
+    background: rgb(71, 13, 107);
+    background: linear-gradient(34deg, rgba(71, 13, 107, 1) 20%, rgba(54, 11, 77, 1) 61%, rgba(54, 11, 82, 0.9752275910364145) 92%);
+    box-shadow: 9px 9px 29px 4px rgba(6, 27, 16, 1);
+}
+
+.btn.btn_in_betting {
+    margin-top: .5rem;
+}
+
+
+/* betting */
+.board.betting {
+    justify-content: center;
+    align-items: center;
+}
+
+.betting__container {
+    font-size: 2rem;
+    color: azure;
+    background: rgb(54, 13, 107);
+    background: linear-gradient(34deg, rgba(54, 13, 107, 1) 20%, rgba(44, 11, 77, 1) 61%, rgba(47, 11, 82, 0.9752275910364145) 92%);
+    box-shadow: 9px 9px 29px 4px rgba(6, 27, 16, 1);
+    padding: 1rem;
+}
+
+.betting__container input {
+    font-size: 2rem;
+    width: 50%;
+    color: azure;
+    background: rgb(71, 13, 107);
+    background: linear-gradient(34deg, rgba(71, 13, 107, 1) 20%, rgba(54, 11, 77, 1) 61%, rgba(54, 11, 82, 0.9752275910364145) 92%);
+    border: none;
+    text-align: center;
+}
+
+/* throwing dices */
 .dices__row {
     display: flex;
     width: 100%;
