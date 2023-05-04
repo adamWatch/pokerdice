@@ -1,0 +1,5 @@
+.tick-field {
+    transform: scale(2);
+    cursor: pointer;
+    width: 16%;
+}
