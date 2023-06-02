@@ -1,8 +1,15 @@
 import React from 'react';
 import './tickField.css';
 
-export function TickField() {
+interface Props{
+
+  index:number;
+  setChecked:any;
+}
+
+export function TickField(props:Props) {
+  const { index, setChecked } = props;
   return (
-    <input type="checkbox" className="tick-field" />
+    <input type="checkbox" className="tick-field" key={index} onChange={() => setChecked(index)} />
   );
 }
