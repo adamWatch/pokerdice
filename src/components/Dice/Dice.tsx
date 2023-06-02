@@ -2,13 +2,12 @@ import React from 'react';
 import './dice.css';
 
 interface Props{
-  diceNo: string
+  diceNo: number
 }
 
 export function Dice(props:Props) {
   const { diceNo } = props;
   const urlToImage = `url(/images/${diceNo}.png)`;
-  console.log(urlToImage);
 
   return (
     <div className="dice__container">
