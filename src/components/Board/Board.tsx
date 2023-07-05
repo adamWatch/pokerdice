@@ -10,7 +10,7 @@ export function Board() {
   const [resultPl, setResultPl] = useState('nothing');
   const [listOfDicesAi, setListOfDicesAi] = useState<number[]>([]);
   const [resultAi, setResultAi] = useState('nothing');
-  const [tickFieldValues, setTickFieldValues] = useState<boolean[]>([false, false, false, false, false, false]);
+  const [tickFieldValues, setTickFieldValues] = useState<boolean[]>([false, false, false, false, false]);
   const handleTickFieldChange = (index:number) => {
     const newTickFieldValues = [...tickFieldValues];
     newTickFieldValues[index] = !newTickFieldValues[index];
@@ -18,6 +18,7 @@ export function Board() {
   };
   const [money, setMoney] = useState(100);
   const [bet, setBet] = useState(1);
+
   const handleBetChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     let stake = Number(event.target.value);
     if (stake > money) {
@@ -27,25 +28,54 @@ export function Board() {
     }
     setBet(stake);
   };
+
+  const handleListOfDicesPl = (listOfIndex:number[] = [], listOfThrowedDices:number[] = []) => {
+    const newListOfPlayerDices = [...listOfDicesPl];
+
+    listOfIndex.map((indexDice, index) => {
+      newListOfPlayerDices[indexDice] = listOfThrowedDices[index];
+      return;
+    });
+    console.log(newListOfPlayerDices, 'newlist');
+    console.log(listOfDicesPl, 'listodDicespl');
+    return newListOfPlayerDices;
+  };
+
   const closeBetting = () => {
     setIsBetting(false);
   };
-  const throwDices = (amountOfDices:6) => {
+
+  const throwDices = (amountOfDices:number) => {
     const listOfDices = [];
     for (let i = 0; i < amountOfDices; i++) {
-      const dice = Math.floor(Math.random() * 6) + 1;
+      const dice = Math.floor(Math.random() * 5) + 1;
       listOfDices.push(dice);
     }
     console.log(listOfDices);
     return listOfDices;
   };
   const throwAfterSetStake = () => {
-    const listOfDicesPl = throwDices(6);
-    const listOfDicesAi = throwDices(6);
-    setListOfDicesPl(listOfDicesPl);
-    setListOfDicesAi(listOfDicesAi);
+    const listOfDicesPlIn = throwDices(5);
+    const listOfDicesAiIn = throwDices(5);
+    setListOfDicesPl(listOfDicesPlIn);
+    setListOfDicesAi(listOfDicesAiIn);
     setMoney(money - bet);
     closeBetting();
+  };
+  const secondThrow = () => {
+    const listOfIndexDicesPl = tickFieldValues.map((tickFieldValue, index) => {
+      if (tickFieldValue) {
+        return index;
+      }
+      return -1;
+    }).filter((index) => index !== -1);
+
+    if (listOfIndexDicesPl.length === 0) return;
+    // throw selected dices
+    const listOfDicesPlIn = throwDices(listOfIndexDicesPl.length);
+    console.log(listOfDicesPlIn);
+    const newListOfPlayerDices = handleListOfDicesPl(listOfIndexDicesPl, listOfDicesPlIn);
+    setListOfDicesPl(newListOfPlayerDices);
   };
   console.log(listOfDicesPl);
   if (isBetting) {
@@ -86,7 +116,7 @@ export function Board() {
           <span>You</span>
         </div>
         <div className="button__container">
-          <button className="btn" type="button">Throw dice</button>
+          <button className="btn" type="button" onClick={secondThrow}>Throw dice</button>
           <button className="btn" type="button">Continue</button>
         </div>
       </div>
