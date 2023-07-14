@@ -1,15 +1,17 @@
 /* eslint-disable react/no-array-index-key */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './board.css';
 import { Dice } from '../Dice/Dice';
 import { TickField } from '../TickField/TickField';
+import { checkDices } from '../utils/checkDices';
+import { DiceLayout } from '../../types/boardTypes/diceLayout';
 
 export function Board() {
   const [isBetting, setIsBetting] = useState(true);
   const [listOfDicesPl, setListOfDicesPl] = useState<number[]>([]);
-  const [resultPl, setResultPl] = useState('nothing');
+  const [resultPl, setResultPl] = useState({ text: 'nothing', value: 1 });
   const [listOfDicesAi, setListOfDicesAi] = useState<number[]>([]);
-  const [resultAi, setResultAi] = useState('nothing');
+  const [resultAi, setResultAi] = useState({ text: 'nothing', value: 1 });
   const [tickFieldValues, setTickFieldValues] = useState<boolean[]>([false, false, false, false, false]);
   const handleTickFieldChange = (index:number) => {
     const newTickFieldValues = [...tickFieldValues];
@@ -18,6 +20,13 @@ export function Board() {
   };
   const [money, setMoney] = useState(100);
   const [bet, setBet] = useState(1);
+
+  useEffect(() => {
+    const throwedLayoutPl = checkDices(listOfDicesPl);
+    setResultPl(throwedLayoutPl);
+    const throwedLayoutAi = checkDices(listOfDicesAi);
+    setResultAi(throwedLayoutAi);
+  }, [listOfDicesPl]);
 
   const handleBetChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     let stake = Number(event.target.value);
@@ -36,8 +45,6 @@ export function Board() {
       newListOfPlayerDices[indexDice] = listOfThrowedDices[index];
       return;
     });
-    console.log(newListOfPlayerDices, 'newlist');
-    console.log(listOfDicesPl, 'listodDicespl');
     return newListOfPlayerDices;
   };
 
@@ -54,11 +61,17 @@ export function Board() {
     console.log(listOfDices);
     return listOfDices;
   };
-  const throwAfterSetStake = () => {
+  const throwAfterSetStake = async () => {
     const listOfDicesPlIn = throwDices(5);
     const listOfDicesAiIn = throwDices(5);
     setListOfDicesPl(listOfDicesPlIn);
+    // Set result
+    const throwedLayoutPl = checkDices(listOfDicesPl);
+    setResultPl(throwedLayoutPl);
     setListOfDicesAi(listOfDicesAiIn);
+    const throwedLayoutAi = checkDices(listOfDicesAi);
+    setResultAi(throwedLayoutAi);
+
     setMoney(money - bet);
     closeBetting();
   };
@@ -73,11 +86,13 @@ export function Board() {
     if (listOfIndexDicesPl.length === 0) return;
     // throw selected dices
     const listOfDicesPlIn = throwDices(listOfIndexDicesPl.length);
-    console.log(listOfDicesPlIn);
     const newListOfPlayerDices = handleListOfDicesPl(listOfIndexDicesPl, listOfDicesPlIn);
     setListOfDicesPl(newListOfPlayerDices);
+    const throwedLayoutPl = checkDices(listOfDicesPl);
+    setResultPl(throwedLayoutPl);
+    // Ai set todo
   };
-  console.log(listOfDicesPl);
+
   if (isBetting) {
     return (
       <div className="board betting">
@@ -107,7 +122,7 @@ export function Board() {
       <div className="result__container">
         Result:
         {' '}
-        <span className="result">{resultAi}</span>
+        <span className="result">{resultAi.text}</span>
       </div>
 
       <div className="btn_result_container">
@@ -134,7 +149,7 @@ export function Board() {
       <div className="result__container">
         Result:
         {' '}
-        <span className="result">{resultPl}</span>
+        <span className="result">{resultPl.text}</span>
       </div>
     </div>
   );
