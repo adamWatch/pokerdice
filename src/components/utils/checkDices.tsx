@@ -1,5 +1,3 @@
-import React from 'react';
-
 export function checkDices(listOfDices:number[] = []) {
   function countOccurrences() {
     const listOfNum = {
