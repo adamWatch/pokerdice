@@ -4,6 +4,6 @@ export const throwDices = (amountOfDices:number) => {
     const dice = Math.floor(Math.random() * 5) + 1;
     listOfDices.push(dice);
   }
-  console.log(listOfDices);
+
   return listOfDices;
 };
