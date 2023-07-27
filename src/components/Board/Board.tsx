@@ -5,6 +5,8 @@ import { Dice } from '../Dice/Dice';
 import { TickField } from '../TickField/TickField';
 import { checkDices } from '../utils/checkDices';
 import { DiceLayout } from '../../types/boardTypes/diceLayout';
+import { aiChooser } from '../utils/aiChooser';
+import { throwDices } from '../utils/throwDices';
 
 export function Board() {
   const [isBetting, setIsBetting] = useState(true);
@@ -12,6 +14,7 @@ export function Board() {
   const [resultPl, setResultPl] = useState({ text: 'nothing', value: 1 });
   const [listOfDicesAi, setListOfDicesAi] = useState<number[]>([]);
   const [resultAi, setResultAi] = useState({ text: 'nothing', value: 1 });
+  const [winIs, setWinIs] = useState('');
   const [tickFieldValues, setTickFieldValues] = useState<boolean[]>([false, false, false, false, false]);
   const handleTickFieldChange = (index:number) => {
     const newTickFieldValues = [...tickFieldValues];
@@ -20,6 +23,21 @@ export function Board() {
   };
   const [money, setMoney] = useState(100);
   const [bet, setBet] = useState(1);
+
+  // why not render when setWinIs?
+  const whoWin = () => {
+    if (resultPl.value > resultAi.value) {
+      setWinIs('You');
+    } else if (resultPl.value < resultAi.value) {
+      setWinIs('Ai');
+    } else if (resultAi === resultPl) {
+      setWinIs('Draw');
+    }
+  };
+
+  useEffect(() => {
+    console.log('WinIs updated:', winIs);
+  }, [winIs]);
 
   useEffect(() => {
     const throwedLayoutPl = checkDices(listOfDicesPl);
@@ -47,20 +65,13 @@ export function Board() {
     });
     return newListOfPlayerDices;
   };
-
+  const handleResultAi = ({ text, value }: { text: string, value: number }) => {
+    setResultAi({ text, value });
+  };
   const closeBetting = () => {
     setIsBetting(false);
   };
 
-  const throwDices = (amountOfDices:number) => {
-    const listOfDices = [];
-    for (let i = 0; i < amountOfDices; i++) {
-      const dice = Math.floor(Math.random() * 5) + 1;
-      listOfDices.push(dice);
-    }
-    console.log(listOfDices);
-    return listOfDices;
-  };
   const throwAfterSetStake = async () => {
     const listOfDicesPlIn = throwDices(5);
     const listOfDicesAiIn = throwDices(5);
@@ -90,7 +101,16 @@ export function Board() {
     setListOfDicesPl(newListOfPlayerDices);
     const throwedLayoutPl = checkDices(listOfDicesPl);
     setResultPl(throwedLayoutPl);
-    // Ai set todo
+    const newAiResultAndDices = aiChooser(resultAi, listOfDicesAi);
+    setListOfDicesAi(newAiResultAndDices.listOfDicesAi);
+    handleResultAi(newAiResultAndDices);
+    whoWin();
+  };
+  const pass = () => {
+    const newAiResultAndDices = aiChooser(resultAi, listOfDicesAi);
+    setListOfDicesAi(newAiResultAndDices.listOfDicesAi);
+    handleResultAi(newAiResultAndDices);
+    whoWin();
   };
 
   if (isBetting) {
@@ -128,11 +148,11 @@ export function Board() {
       <div className="btn_result_container">
         <div className="handle__game win">
           <p>Winner is:</p>
-          <span>You</span>
+          <span>{winIs}</span>
         </div>
         <div className="button__container">
           <button className="btn" type="button" onClick={secondThrow}>Throw dice</button>
-          <button className="btn" type="button">Continue</button>
+          <button className="btn" type="button" onClick={pass}>Pass</button>
         </div>
       </div>
 
