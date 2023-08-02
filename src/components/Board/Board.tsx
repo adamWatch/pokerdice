@@ -30,21 +30,25 @@ export function Board() {
       setWinIs('You');
     } else if (resultPl.value < resultAi.value) {
       setWinIs('Ai');
-    } else if (resultAi === resultPl) {
+    } else if (resultAi.value === resultPl.value) {
       setWinIs('Draw');
     }
   };
-
-  useEffect(() => {
-    console.log('WinIs updated:', winIs);
-  }, [winIs]);
 
   useEffect(() => {
     const throwedLayoutPl = checkDices(listOfDicesPl);
     setResultPl(throwedLayoutPl);
     const throwedLayoutAi = checkDices(listOfDicesAi);
     setResultAi(throwedLayoutAi);
-  }, [listOfDicesPl]);
+    console.log('result ai fi', resultAi);
+    console.log('result pl fi', resultPl);
+  }, [listOfDicesPl, listOfDicesAi]);
+
+  useEffect(() => {
+    whoWin();
+    console.log('result ai', resultAi);
+    console.log('result pl', resultPl);
+  }, [listOfDicesAi, listOfDicesPl]);
 
   const handleBetChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     let stake = Number(event.target.value);
@@ -104,13 +108,11 @@ export function Board() {
     const newAiResultAndDices = aiChooser(resultAi, listOfDicesAi);
     setListOfDicesAi(newAiResultAndDices.listOfDicesAi);
     handleResultAi(newAiResultAndDices);
-    whoWin();
   };
   const pass = () => {
     const newAiResultAndDices = aiChooser(resultAi, listOfDicesAi);
     setListOfDicesAi(newAiResultAndDices.listOfDicesAi);
     handleResultAi(newAiResultAndDices);
-    whoWin();
   };
 
   if (isBetting) {
