@@ -4,7 +4,6 @@ import './board.css';
 import { Dice } from '../Dice/Dice';
 import { TickField } from '../TickField/TickField';
 import { checkDices } from '../utils/checkDices';
-import { DiceLayout } from '../../types/boardTypes/diceLayout';
 import { aiChooser } from '../utils/aiChooser';
 import { throwDices } from '../utils/throwDices';
 
@@ -15,8 +14,9 @@ export function Board() {
   const [listOfDicesAi, setListOfDicesAi] = useState<number[]>([]);
   const [resultAi, setResultAi] = useState({ text: 'nothing', value: 1 });
   const [winIs, setWinIs] = useState('');
+  const [gameEnd, setGameEnd] = useState(false);
   const [tickFieldValues, setTickFieldValues] = useState<boolean[]>([false, false, false, false, false]);
-  const handleTickFieldChange = (index:number) => {
+  const handleTickFieldChange = (index: number) => {
     const newTickFieldValues = [...tickFieldValues];
     newTickFieldValues[index] = !newTickFieldValues[index];
     setTickFieldValues(newTickFieldValues);
@@ -24,13 +24,12 @@ export function Board() {
   const [money, setMoney] = useState(100);
   const [bet, setBet] = useState(1);
 
-  // why not render when setWinIs?
-  const whoWin = () => {
-    if (resultPl.value > resultAi.value) {
+  const whoWin = (plValue: number, aiValue: number) => {
+    if (plValue > aiValue) {
       setWinIs('You');
-    } else if (resultPl.value < resultAi.value) {
+    } else if (plValue < aiValue) {
       setWinIs('Ai');
-    } else if (resultAi.value === resultPl.value) {
+    } else if (plValue === aiValue) {
       setWinIs('Draw');
     }
   };
@@ -40,15 +39,19 @@ export function Board() {
     setResultPl(throwedLayoutPl);
     const throwedLayoutAi = checkDices(listOfDicesAi);
     setResultAi(throwedLayoutAi);
-    console.log('result ai fi', resultAi);
-    console.log('result pl fi', resultPl);
+    whoWin(throwedLayoutPl.value, throwedLayoutAi.value);
   }, [listOfDicesPl, listOfDicesAi]);
 
-  useEffect(() => {
-    whoWin();
-    console.log('result ai', resultAi);
-    console.log('result pl', resultPl);
-  }, [listOfDicesAi, listOfDicesPl]);
+  const endTurn = () => {
+    if (winIs === 'You') {
+      const prize = bet * 2;
+      setMoney(money + prize);
+
+      setBet(1);
+    } else if (winIs === 'Ai' || winIs === 'Draw') {
+      setBet(1);
+    }
+  };
 
   const handleBetChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     let stake = Number(event.target.value);
@@ -60,7 +63,7 @@ export function Board() {
     setBet(stake);
   };
 
-  const handleListOfDicesPl = (listOfIndex:number[] = [], listOfThrowedDices:number[] = []) => {
+  const handleListOfDicesPl = (listOfIndex: number[] = [], listOfThrowedDices: number[] = []) => {
     const newListOfPlayerDices = [...listOfDicesPl];
 
     listOfIndex.map((indexDice, index) => {
@@ -76,16 +79,12 @@ export function Board() {
     setIsBetting(false);
   };
 
-  const throwAfterSetStake = async () => {
+  const throwAfterSetStake = () => {
     const listOfDicesPlIn = throwDices(5);
     const listOfDicesAiIn = throwDices(5);
     setListOfDicesPl(listOfDicesPlIn);
     // Set result
-    const throwedLayoutPl = checkDices(listOfDicesPl);
-    setResultPl(throwedLayoutPl);
     setListOfDicesAi(listOfDicesAiIn);
-    const throwedLayoutAi = checkDices(listOfDicesAi);
-    setResultAi(throwedLayoutAi);
 
     setMoney(money - bet);
     closeBetting();
@@ -103,17 +102,66 @@ export function Board() {
     const listOfDicesPlIn = throwDices(listOfIndexDicesPl.length);
     const newListOfPlayerDices = handleListOfDicesPl(listOfIndexDicesPl, listOfDicesPlIn);
     setListOfDicesPl(newListOfPlayerDices);
-    const throwedLayoutPl = checkDices(listOfDicesPl);
-    setResultPl(throwedLayoutPl);
     const newAiResultAndDices = aiChooser(resultAi, listOfDicesAi);
     setListOfDicesAi(newAiResultAndDices.listOfDicesAi);
     handleResultAi(newAiResultAndDices);
+    setGameEnd(true);
   };
   const pass = () => {
     const newAiResultAndDices = aiChooser(resultAi, listOfDicesAi);
     setListOfDicesAi(newAiResultAndDices.listOfDicesAi);
     handleResultAi(newAiResultAndDices);
+    setGameEnd(true);
   };
+
+  const continueGame = () => {
+    endTurn();
+    setGameEnd(false);
+    setIsBetting(true);
+  };
+
+  if (gameEnd) {
+    return (
+      <div className="board">
+        <h2 className="player">Ai Dices</h2>
+        <div className="dices__row ai">
+          {listOfDicesAi.map((dice, index) => <Dice diceNo={dice} key={index + 6} />)}
+
+        </div>
+        <div className="result__container">
+          Result:
+          {' '}
+          <span className="result">{resultAi.text}</span>
+        </div>
+
+        <div className="btn_result_container">
+          <div className="handle__game win">
+            <p>Winner is:</p>
+            <span>{winIs}</span>
+          </div>
+          <div className="button__container">
+            <button className="btn" type="button" onClick={continueGame}>Continue</button>
+          </div>
+        </div>
+
+        <h2 className="player">Player Dices</h2>
+        <div className="dices__row player">
+          {listOfDicesPl.map((dice, index) => <Dice diceNo={dice} key={index} />)}
+
+        </div>
+
+        <div className="tick-field__row">
+          {tickFieldValues.map((tickField, index) => <TickField index={index} setChecked={handleTickFieldChange} key={index + 12} />)}
+
+        </div>
+        <div className="result__container">
+          Result:
+          {' '}
+          <span className="result">{resultPl.text}</span>
+        </div>
+      </div>
+    );
+  }
 
   if (isBetting) {
     return (

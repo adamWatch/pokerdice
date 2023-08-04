@@ -53,6 +53,6 @@ export function aiChooser(aiResult:DiceLayout, listOfDicesAi:number[]) {
   aiChooserResult.text = newLayout.text;
   aiChooserResult.value = newLayout.value;
   aiChooserResult.listOfDicesAi = newListOfAiDices;
-  console.log(aiChooserResult);
+
   return aiChooserResult;
 }
